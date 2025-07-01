@@ -4,13 +4,22 @@ import glob
 import argparse
 from typing import Iterable
 
+DEFAULT_REGEX = "A-Za-z0-9"
+
+
 
 def compile_regex_from_source(source_string_) -> re.Pattern:
 
+    # TODO: fix nested brackets
+
+    # Replace patterns with specified regex
     pattern = re.sub(r'\{(\w+):([^\}]+)\}', r'(?P<\1>\2)', source_string_)
 
     # Replace all {group} with the default regex pattern
-    pattern = re.sub(r'\{(\w+)\}', r'(?P<\1>[A-Za-z0-9]+)', pattern)
+    pattern = re.sub(r'\{(\w+)\}', rf'(?P<\1>[{DEFAULT_REGEX}]+)', pattern)
+
+    if ("{" in pattern) or ("}" in pattern):
+        raise ValueError("Regex {n} are not supported currently")
 
     # Compile the regex
     return re.compile(pattern)
@@ -36,14 +45,15 @@ def apply_regex(filepath: str, target_pattern: str, regex: re.Pattern) -> str:
     else:
         # TODO: better information on why this can happen.
         raise ValueError(
-            f'Invalid pattern in: {filepath}. '
-            f'This can happen when a globbed character is not permitted by the specified regex; most likely [_.].'
-            f'For example if a file is named /path/to_my_file,txt and the source pattern is /path/'
+            f'Invalid pattern in: {filepath} given pattern: {regex}.'
+            f'This can happen when a globbed string is not matched by the specified regex; most likely [_.]. '
+            'For example if a file is named /path/to_my_file,txt and the source pattern is /path/{name}.txt '
+            f'Recall that the default regex is [A-Za-z0-9]+ and does not include any special characters. '
             f'See the documentation for more information. '
         )
 
 
-def validate_targets(filepaths: Iterable[str], target_string: str, regex: re.Pattern) -> None:
+def determine_and_validate_targets(filepaths: Iterable[str], target_string: str, regex: re.Pattern) -> dict[str, str]:
 
     targets = dict()
 
@@ -53,7 +63,7 @@ def validate_targets(filepaths: Iterable[str], target_string: str, regex: re.Pat
             raise RuntimeError(f"Duplicate target ({target_}) found. From {targets[target_]} and {filepath}. "
                                f"Other duplicate targets may exist: error thrown on first duplicate target ")
 
-    return
+    return targets
 
 
 def cli(source_string, target_string, create, skipvalidation, clobber):
@@ -65,37 +75,26 @@ def cli(source_string, target_string, create, skipvalidation, clobber):
     # then logic to translate the source string into a glob
     glob_pattern = create_glob_from_source(source_string)
 
-    # then loop through the matched filepaths and apply logic to create new target for each, using the regex.
-    # this step is skippable
-    # internal: apply_regex
-    # func(filepaths (iterator), compiled_regex). Validates the targets are unique. -> None
+    # Create the actual file: link mapping
+    target_dict = determine_and_validate_targets(
+        glob.glob(glob_pattern),
+        target_string,
+        compiled_pattern
+    )
 
-    # loop through matched filepaths again, compute source/target for each
-    # each interation has a source and target
-    # func(source, target, create=False, absolute=False, clobber=False) -> True
-
-
-    # Define the regex pattern based on the match_string
-    # Replace all {group:regex} with (?P<group>regex)
-    validate_targets(glob.glob(glob_pattern), target_string, compiled_pattern)
-
-    for source_path in glob.glob(glob_pattern):
-        # Match the filepath against the regex
-        target_ = apply_regex(source_path, target_string, compiled_pattern)
+    for source_path, target_path in target_dict.items():
 
         if create:
-            # Create the directory if it doesn't exist
-            os.makedirs(os.path.dirname(target_), exist_ok=True)
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
 
-            # Create the symlink
-            if clobber and os.path.islink(target_):
-                os.unlink(target_)
+            if clobber and os.path.islink(target_path):
+                os.unlink(target_path)
 
-            os.symlink(source_path, target_)
+            os.symlink(source_path, target_path)
 
-            print(f'Created symlink: {source_path} -> {target_}')
+            print(f'Created symlink: {source_path} -> {target_path}')
         else:
-            print(f'Would link: {source_path} -> {target_}')
+            print(f'Would link: {source_path} -> {target_path}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create symlinks based on a match string and output format.')
