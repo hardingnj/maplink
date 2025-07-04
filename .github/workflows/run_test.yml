@@ -26,6 +26,6 @@ jobs:
         run: |
           for version in 3.12 3.13 3.14; do
             echo "Testing with Python $version"
-            uv run --python-version $version python -m pytest -v -s
+            uv run --python $version python -m pytest -v -s
           done
 
