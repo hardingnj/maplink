@@ -3,7 +3,7 @@ name = "maplink"
 version = "0.1.0"
 description = "Simple python utility for making symbolic links"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = []
 
 [dependency-groups]

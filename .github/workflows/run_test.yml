@@ -1,27 +1,31 @@
 name: Run Unit Test via Pytest  
   
 on: [push]  
-  
-jobs:  
-  build:  
-    runs-on: ubuntu-latest  
-    strategy:  
-      matrix:  
-        python-version: ["3.12"]  
-  
-    steps:  
-      - uses: actions/checkout@v3  
-      - name: Set up Python ${{ matrix.python-version }}  
-        uses: actions/setup-python@v4  
-        with:  
-          python-version: ${{ matrix.python-version }}  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python (default version)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # Use the default Python version on Ubuntu
+
       - name: Install uv
         run: |
           pip install uv
+
       - name: Install dependencies
         run: |
           uv sync --dev  # This command installs all dependencies listed in pyproject.toml
-      - name: Test with pytest  
+
+      - name: Test with pytest across different Python versions
         run: |
-          uv run python -m pytest  -v -s  
+          for version in 3.12 3.13 3.14; do
+            echo "Testing with Python $version"
+            uv run --python $version python -m pytest -v -s
+          done
 
