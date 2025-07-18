@@ -110,14 +110,9 @@ def cli(source_template, target_template, create, clobber, match_underscore, mat
     """Create symlinks based on MATCH_STRING and OUTPUT format."""
 
     # first transform source_string into a regex
-<<<<<<< Updated upstream
-    compiled_pattern = compile_regex_from_source(source_template, match_underscore, match_period, match_hyphen)
-=======
     compiled_pattern = compile_regex_from_source(
         source_template, match_underscore, match_period, match_hyphen
     )
-    print(compiled_pattern)
->>>>>>> Stashed changes
 
     # then logic to translate the source string into a glob
     glob_pattern = create_glob_from_source(source_template)
