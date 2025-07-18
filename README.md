@@ -37,15 +37,24 @@ of some tool.
 ```
 ls tests/fixtures
 ```
-> S1_R1_001.fastq.gz S1_R2_001.fastq.gz S2_R1_001.fastq.gz S2_R2_001.fastq.gz
+> S1_R1_001.fastq.gz 
+
+> S1_R2_001.fastq.gz 
+
+> S2_R1_001.fastq.gz 
+
+> S2_R2_001.fastq.gz
 
 ```
 maplink tests/fixtures/{sample}_{read}_{lane}.fastq.gz links/{sample}/{sample}_R{read}_L{lane}.fastq.gz --create
 ```
 
 > Created symlink: tests/fixtures/S2_R2_001.fastq.gz -> links/S2/S2_RR2_L001.fastq.gz
+
 > Created symlink: tests/fixtures/S1_R1_001.fastq.gz -> links/S1/S1_RR1_L001.fastq.gz
+
 > Created symlink: tests/fixtures/S1_R2_001.fastq.gz -> links/S1/S1_RR2_L001.fastq.gz
+
 > Created symlink: tests/fixtures/S2_R1_001.fastq.gz -> links/S2/S2_RR1_L001.fastq.gz
 
 ## Handling matching groups
@@ -56,17 +65,32 @@ Let's assume the sample ID contains a hyphen in some cases.
 ```
 ls tests/fixtures
 ```
-> S1_R1_001.fastq.gz S1_R2_001.fastq.gz S2_R1_001.fastq.gz S2_R2_001.fastq.gz S2-A_R1_001.fastq.gz S2-A_R2_001.fastq.gz
+> S1_R1_001.fastq.gz
+ 
+> S1_R2_001.fastq.gz 
+ 
+> S2_R1_001.fastq.gz
+ 
+> S2_R2_001.fastq.gz
+
+> S2-A_R1_001.fastq.gz
+ 
+> S2-A_R2_001.fastq.gz
 
 ```
 maplink "tests/fixtures/{sample:[A-Za-z0-9-]+}_{read}_{lane}.fastq.gz" links/{sample}/{sample}_R{read}_L{lane}.fastq.gz
 ```
 
 > Would link: tests/fixtures/S2-A_R1_001.fastq.gz -> links/S2-A/S2-A_RR1_L001.fastq.gz
+
 > Would link: tests/fixtures/S2_R2_001.fastq.gz -> links/S2/S2_RR2_L001.fastq.gz
+
 > Would link: tests/fixtures/S1_R1_001.fastq.gz -> links/S1/S1_RR1_L001.fastq.gz
+
 > Would link: tests/fixtures/S1_R2_001.fastq.gz -> links/S1/S1_RR2_L001.fastq.gz
+
 > Would link: tests/fixtures/S2-A_R2_001.fastq.gz -> links/S2-A/S2-A_RR2_L001.fastq.gz
+
 > Would link: tests/fixtures/S2_R1_001.fastq.gz -> links/S2/S2_RR1_L001.fastq.gz
 
 Important: 
