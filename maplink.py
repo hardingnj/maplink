@@ -26,6 +26,7 @@ def compile_regex_from_source(source_string_: str, match_underscore: bool = Fals
     # Replace all {group} with the default regex pattern
     pattern = re.sub(r'\{(\w+)\}', rf'(?P<\1>[{char_set}]+)', pattern)
 
+    print(pattern)
     if ("{" in pattern) or ("}" in pattern):
         raise ValueError("Regex {n} are not supported currently")
 
@@ -33,10 +34,14 @@ def compile_regex_from_source(source_string_: str, match_underscore: bool = Fals
     return re.compile(pattern)
 
 def create_glob_from_source(source_string_) -> str:
-    glob_pattern = re.sub(r'\{(\w+):([^\}]+)\}', r'*', source_string_)  # Replace group placeholders with wildcards
-    glob_pattern = re.sub(r'\{(\w+)\}', r'*', glob_pattern)  # Replace default group placeholders with wildcards
 
-    print(glob_pattern)
+    glob_pattern = re.sub(
+        r"\{(\w+):([^\}]+)\}", r"*", source_string_
+    )  # Replace group placeholders with wildcards
+    glob_pattern = re.sub(
+        r"\{(\w+)\}", r"*", glob_pattern
+    )  # Replace default group placeholders with wildcards
+
     return glob_pattern
 
 def apply_regex(filepath: str, target_pattern: str, regex: re.Pattern) -> str:
@@ -105,7 +110,14 @@ def cli(source_template, target_template, create, clobber, match_underscore, mat
     """Create symlinks based on MATCH_STRING and OUTPUT format."""
 
     # first transform source_string into a regex
+<<<<<<< Updated upstream
     compiled_pattern = compile_regex_from_source(source_template, match_underscore, match_period, match_hyphen)
+=======
+    compiled_pattern = compile_regex_from_source(
+        source_template, match_underscore, match_period, match_hyphen
+    )
+    print(compiled_pattern)
+>>>>>>> Stashed changes
 
     # then logic to translate the source string into a glob
     glob_pattern = create_glob_from_source(source_template)
