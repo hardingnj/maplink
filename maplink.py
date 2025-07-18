@@ -31,6 +31,7 @@ def compile_regex_from_source(
     # Replace all {group} with the default regex pattern
     pattern = re.sub(r"\{(\w+)\}", rf"(?P<\1>[{char_set}]+)", pattern)
 
+    print(pattern)
     if ("{" in pattern) or ("}" in pattern):
         raise ValueError("Regex {n} are not supported currently")
 
@@ -39,6 +40,7 @@ def compile_regex_from_source(
 
 
 def create_glob_from_source(source_string_) -> str:
+
     glob_pattern = re.sub(
         r"\{(\w+):([^\}]+)\}", r"*", source_string_
     )  # Replace group placeholders with wildcards
@@ -46,7 +48,6 @@ def create_glob_from_source(source_string_) -> str:
         r"\{(\w+)\}", r"*", glob_pattern
     )  # Replace default group placeholders with wildcards
 
-    print(glob_pattern)
     return glob_pattern
 
 
